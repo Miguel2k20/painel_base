@@ -16,8 +16,3 @@ export const AppDataSource = new DataSource({
     migrations: [`${__dirname}/**/migrations/*.{ts,js}`],
     subscribers: []
 })
-
-console.log(process.env.DB_PORT)
-console.log(process.env.DB_USER)
-console.log(process.env.DB_PASS)
-console.log(process.env.DB_NAME)
