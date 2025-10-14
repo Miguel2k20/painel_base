@@ -5,8 +5,9 @@ import {
     FastifyReply 
 } from "fastify"
 
+import { UserController } from './controllers/UserController'
+const userController = new UserController();
+
 export async function routes(fastify:FastifyInstance, Options:FastifyPluginOptions) {
-    fastify.get("/", async (request:FastifyRequest, reply:FastifyReply) => {
-        return { message: "Oie clara"}
-    })
+    fastify.post("/users", userController.create.bind(userController))
 }
