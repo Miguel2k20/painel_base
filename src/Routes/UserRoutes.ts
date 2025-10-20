@@ -40,12 +40,10 @@ export async function UserRoutes(fastify:FastifyInstance, Options:FastifyPluginO
         });
     });
 
-    fastify.post("/show", async (request:FastifyRequest<{ Body: CreateUserBody }>, reply:FastifyReply) => {
+    fastify.post("/show", async (request:FastifyRequest, reply:FastifyReply) => {
         reply.status(200).send({
             statusCode: 200,
             message: "Dados do usuario fds!"
         });
     });
-
-
 }
