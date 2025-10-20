@@ -1,6 +1,8 @@
-import { FastifyReply, FastifyRequest } from "fastify";
 import { UserRepository } from "../repositories/UserRepository";
 import bcrypt from 'bcrypt'
+import { FastifyInstance, FastifyPluginOptions, FastifyReply, FastifyRequest } from "fastify";
+import { AuthMiddleware } from "../middleware/authMiddleware";
+import { userSchema } from "../schemas/userSchema";
 
 interface CreateUserBody {
     email: string;
@@ -8,17 +10,10 @@ interface CreateUserBody {
     password: string;
 }
 
-export class UserController {
-    async create(request: FastifyRequest<{ Body: CreateUserBody }>, reply: FastifyReply) {
-        
-        const { name, email, password } = request.body
-        
-        if(!name || !email || !password){
-            reply.status(400).send({
-                statusCode: 400,
-                message: "Campos obrigatórios não presentes"
-            });
-        }
+export async function UserRoutes(fastify:FastifyInstance, Options:FastifyPluginOptions) {
+    
+    fastify.post("/users", {preHandler:AuthMiddleware, schema: userSchema.create}, async (request:FastifyRequest, reply:FastifyReply) => {
+        const { name, email, password } = request.body as CreateUserBody
 
         const userExist = await UserRepository.findOneBy({email})
 
@@ -43,5 +38,14 @@ export class UserController {
             statusCode: 200,
             message: "Usuario Cadastrado com sucesso!"
         });
-    }
+    });
+
+    fastify.post("/show", async (request:FastifyRequest<{ Body: CreateUserBody }>, reply:FastifyReply) => {
+        reply.status(200).send({
+            statusCode: 200,
+            message: "Dados do usuario fds!"
+        });
+    });
+
+
 }

@@ -1,24 +1,17 @@
-import { FastifyReply, FastifyRequest } from "fastify";
 import jwt from "jsonwebtoken"
 import { UserRepository } from "../repositories/UserRepository";
 import bcrypt from 'bcrypt'
+import { FastifyInstance, FastifyPluginOptions, FastifyReply, FastifyRequest } from "fastify";
+import { userSchema } from "../schemas/userSchema";
 
 interface LoginBody {
     email: string;
     password: string;
 }
-export class AuthController {
 
-    async login(request:FastifyRequest<{ Body: LoginBody }>, reply: FastifyReply)
-    {
-        const { email, password } = request.body
-
-        if( !email || !password){
-            return reply.status(400).send({
-                statusCode: 400,
-                message: "Campos obrigatórios não presentes"
-            });
-        }
+export async function AuthRoutes(fastify:FastifyInstance, Options:FastifyPluginOptions) {
+    fastify.post("/login", {schema: userSchema.login}, async (request:FastifyRequest, reply:FastifyReply) => {
+        const { email, password } = request.body as LoginBody
 
         const user = await UserRepository.findOneBy({email})
 
@@ -47,5 +40,6 @@ export class AuthController {
             user: userLogin,
             token: token
         });
-    }
+    });
+
 }
