@@ -9,15 +9,5 @@ export const userSchema = {
         password: { type: 'string', minLength: 6 }
       }
     }
-  },
-  login: {
-    body: {
-      type: 'object',
-      required: ['email', 'password'],
-      properties: {
-        email: { type: 'string', format: 'email' },
-        password: { type: 'string'}
-      }
-    }
   }
 };
