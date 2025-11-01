@@ -13,6 +13,13 @@ interface requestParams {
     id: string;
 }
 
+interface UpdateUserBody {
+    email?: string;
+    name?: string;
+    password?: string;
+    active?: boolean;
+}
+
 export async function create(request:FastifyRequest, reply:FastifyReply) {
 
     const { name, email, password } = request.body as CreateUserBody
@@ -71,10 +78,31 @@ export async function show(request:FastifyRequest, reply:FastifyReply) {
 
 export async function update(request:FastifyRequest, reply:FastifyReply) {
     const { id } = request.params as requestParams;
+
+    const user = await UserRepository.findOneBy({ id: Number(id) });
+
+    if(isNaN(Number(id)) || !user) {
+        return reply.status(400).send({
+            statusCode: 400,
+            message: "ID do usuário inválido"
+        });
+    }
+
+    const { password, ...data } = request.body as UpdateUserBody;
+    const updatedData = { ...data } as UpdateUserBody;
+
+    if (password) {
+        updatedData.password = await bcrypt.hash(password, 10);
+    }
+
+    UserRepository.merge(user, updatedData);
+
+    const updatedUser = await UserRepository.save(user);
     
-    reply.status(200).send({
+    return reply.status(200).send({
         statusCode: 200,
-        message: `Rota de update de usuario com id: ${id} em construção!`
+        message: "Usuário atualizado com sucesso.",
+        data: updatedUser,
     });
 
 }
