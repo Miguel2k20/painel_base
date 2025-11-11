@@ -29,13 +29,22 @@ export async function login(request:FastifyRequest, reply:FastifyReply){
         });
     }
 
-    const token = jwt.sign({id:user.id, name:user.name}, process.env.TOKEN_PASS ?? '', {expiresIn: '1d'})
+    const token = jwt.sign(
+        { id: user.id, name: user.name },
+        process.env.TOKEN_PASS ?? "",
+        { expiresIn: "1d" }
+    );
+
+    reply.setCookie("access_token", token, {
+        httpOnly: true, // JS não acessa
+        secure: process.env.NODE_ENV === "production", // só HTTPS em produção
+        sameSite: "lax", // ajuda contra CSRF
+        path: "/", // cookie visível em toda a aplicação
+        maxAge: 24 * 60 * 60, // 1 dia
+    });
     
     const { id, name, email: userEmail } = user;
     const userLogin = { id, name, userEmail };
 
-    reply.status(200).send({
-        user: userLogin,
-        token: token
-    });
+    return reply.send({ id, name, email: userEmail });
 }

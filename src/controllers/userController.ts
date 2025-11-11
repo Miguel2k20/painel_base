@@ -71,7 +71,7 @@ export async function show(request:FastifyRequest, reply:FastifyReply) {
             userInfo: userInfo
         });
 
-    }catch(err) {
+    } catch(err) {
         return reply.status(401).send({ message: "Token inválido ou expirado" });
     }
 }
@@ -105,4 +105,48 @@ export async function update(request:FastifyRequest, reply:FastifyReply) {
         data: updatedUser,
     });
 
+}
+
+export async function deleteUser(request:FastifyRequest, reply:FastifyReply) {
+    const { id } = request.params as requestParams;
+    const user = await UserRepository.findOneBy({ id: Number(id) });
+
+    if(isNaN(Number(id)) || !user) {
+        return reply.status(400).send({
+            statusCode: 400,
+            message: "ID do usuário inválido"
+        });
+    }
+
+    await UserRepository.remove(user);
+
+    return reply.status(200).send({
+        statusCode: 200,
+        message: "Usuário deletado com sucesso."
+    });
+    
+}
+
+export async function userList(request:FastifyRequest, reply:FastifyReply) {
+    const users = await UserRepository.find();
+    return reply.status(200).send({
+        statusCode: 200,
+        users: users
+    });
+}
+
+export async function showUser(request:FastifyRequest, reply:FastifyReply) {
+    const { id } = request.params as requestParams;
+    const user = await UserRepository.findOneBy({ id: Number(id) }); 
+    if(isNaN(Number(id)) || !user) {
+        return reply.status(400).send({
+            statusCode: 400,
+            message: "ID do usuário inválido"
+        });
+        
+    }
+    return reply.status(200).send({
+        statusCode: 200,
+        user: user
+    });
 }

@@ -7,19 +7,16 @@ interface JwtPayload {
 }
 
 export const AuthMiddleware = async (request: FastifyRequest, reply: FastifyReply) => {
-  const { authorization } = request.headers;
+  const token = request.cookies?.access_token;
 
-  if (!authorization) {
-    return reply.status(401).send({
-      statusCode: 401,
-      message: "Usuário não autenticado",
-    });
+  if (!token) {
+    return reply.status(401).send({ message: "Usuário não autenticado" });
   }
 
-  const token = (Array.isArray(authorization) ? authorization[0] : authorization).split(" ")[1];
-
   try {
-    jwt.verify(token, process.env.TOKEN_PASS ?? "") as JwtPayload;
+    const decoded = jwt.verify(token, process.env.TOKEN_PASS ?? "") as JwtPayload;
+    // @ts-ignore
+    request.user = decoded;
   } catch (err) {
     return reply.status(401).send({
       statusCode: 401,
