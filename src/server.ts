@@ -7,9 +7,11 @@ import { UserRoutes } from "./Routes/UserRoutes";
 import { TextContentRoutes } from "./Routes/TextContentRoutes";
 
 AppDataSource.initialize().then(() => {
-    
     const app = fastify();
-    app.register(cors);
+    app.register(cors, {
+      origin: process.env.APP_URL,
+      credentials: true,
+    });
     app.register(fastifyCookie, { secret: process.env.COOKIE_SECRET });
 
     app.register(AuthRoutes);
